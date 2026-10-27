@@ -45,16 +45,16 @@ void setup() {
   // Initialize I2C bus for Gyro
   Wire.begin(SDA_PIN, SCL_PIN);
   
-  // MPU6050 aufwecken
+  // MPU6050 
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x6B); // PWR_MGMT_1 register
   Wire.write(0);    // set to zero (wakes up the MPU-6050)
   byte error = Wire.endTransmission(true);
   
   if (error == 0) {
-    Serial.println("MPU6050 erfolgreich aufgeweckt!");
+    Serial.println("MPU6050 succesasfully started!");
   } else {
-    Serial.print("Fehler beim MPU6050 Init, Fehlercode: ");
+    Serial.print("Error at MPU6050 Init, Error code: ");
     Serial.println(error);
   }
 
@@ -69,21 +69,20 @@ void setup() {
   tft.println("Perchta ITC Box");
   tft.setTextColor(ILI9341_GREEN);
   tft.setCursor(20, 60);
-  tft.println("Gyro laeuft permanent...");
+  tft.println("Gyro is running...");
 
   // Initialize Touch
   touch.begin();
   touch.setRotation(1);
 
-  Serial.println("System bereit.");
+  Serial.println("System ready.");
 }
 
 void loop() {
   float gyroX = 0, gyroY = 0, gyroZ = 0;
 
-  // 1. Gyro abfragen mit Längenprüfung
   Wire.beginTransmission(MPU_ADDR);
-  Wire.write(0x43); // Startregister für Gyro-Daten
+  Wire.write(0x43); 
   byte transError = Wire.endTransmission(false);
 
   if (transError == 0) {
@@ -97,18 +96,17 @@ void loop() {
       gyroY = rawGy / 131.0;
       gyroZ = rawGz / 131.0;
     } else {
-      Serial.println("Fehler: Konnte keine 6 Bytes vom Gyro lesen!");
+      Serial.println("Error: Couldn't read 6 Bytes from Gyro!");
     }
   } else {
-    Serial.println("Fehler bei I2C-Transmission zum Gyro!");
+    Serial.println("Error at I2C-Transmission to Gyro!");
   }
 
   Serial.print("Gyro -> X="); Serial.print(gyroX);
   Serial.print(" Y="); Serial.print(gyroY);
   Serial.print(" Z="); Serial.println(gyroZ);
 
-  // 2. Touch abfragen (mit deinem exakten Mapping)
-  if (touch.touched()) {
+   if (touch.touched()) {
     TS_Point p = touch.getPoint();
 
     int screenX = map(p.x, 350, 3860, 320, 0);
@@ -116,7 +114,6 @@ void loop() {
     screenX = constrain(screenX, 0, 319);
     screenY = constrain(screenY, 0, 239);
 
-    // Auf dem Display anzeigen
     tft.fillRect(0, 120, 320, 100, ILI9341_BLACK);
     
     tft.setTextColor(ILI9341_CYAN);
